@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.Configuration;
+using Models;
 using Models.Models;
 
 namespace ADO.NET
