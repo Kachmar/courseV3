@@ -27,7 +27,6 @@ namespace ADO.NET
                   ,[StartDate]
                   ,[EndDate]
                   ,[PassCredits]
-                  ,[HomeTasksCount]
               FROM [dbo].[Courses]", connection);
 
                 using var reader = sqlCommand.ExecuteReader();
@@ -35,7 +34,7 @@ namespace ADO.NET
                 {
                     Course course = new Course();
                     course.Id = reader.GetInt32(0);
-                    course.Name = reader.GetString(1);
+                    course.Name = reader.GetStringOrDefault(1);
                     course.StartDate = reader.GetDateTime(2);
                     course.EndDate = reader.GetDateTime(3);
                     course.PassCredits = reader.GetInt32(4);
@@ -58,7 +57,7 @@ namespace ADO.NET
             using (SqlConnection connection = GetConnection())
             {
                 SqlCommand sqlCommand = new SqlCommand(
-                    $@"select Id, Date, Title, Description, Number, from HomeTasks                    
+                    $@"select Id, Date, Title, Description, Number from HomeTasks                    
               where CourseId =  {courseId}", connection);
 
                 using var reader = sqlCommand.ExecuteReader();
@@ -84,9 +83,9 @@ namespace ADO.NET
             {
                 SqlCommand sqlCommand = new SqlCommand(
                     $@"select Id, Name, BirthDate, PhoneNumber, Email, GitHubLink, Notes from Students
-                    as c
-              join CourseStudent as cs on cs.StudentsId=c.Id
-              where sc.CoursesId =  {courseId}", connection);
+                    as s
+              join CourseStudent as cs on cs.StudentsId=s.Id
+              where cs.CoursesId =  {courseId}", connection);
 
                 using var reader = sqlCommand.ExecuteReader();
                 while (reader.Read())
