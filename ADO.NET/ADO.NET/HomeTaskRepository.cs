@@ -38,7 +38,35 @@ namespace ADO.NET
                     homeTask.Description = reader.GetStringOrDefault(3);
                     homeTask.Number = reader.GetInt32(4);
                     homeTask.CourseId = reader.GetInt32(5);
+                    homeTask.HomeTaskAssessments = GetHomeTaskAssessments(homeTask.Id);
                     result.Add(homeTask);
+                }
+            }
+
+            return result;
+        }
+
+        private List<HomeTaskAssessment> GetHomeTaskAssessments(int homeTaskId)
+        {
+            List<HomeTaskAssessment> result = new List<HomeTaskAssessment>();
+            using (SqlConnection connection = GetConnection())
+            {
+                SqlCommand sqlCommand = new SqlCommand(
+                    $@"
+                   SELECT [Id]                 
+                  ,[IsComplete]
+                  ,[Date]                              
+              FROM [dbo].[HomeTaskAssessment]             
+              where HomeTaskId =  {homeTaskId}", connection);
+
+                using var reader = sqlCommand.ExecuteReader();
+                while (reader.Read())
+                {
+                    HomeTaskAssessment homeTaskAssessment = new HomeTaskAssessment();
+                    homeTaskAssessment.Id = reader.GetInt32(0);
+                    homeTaskAssessment.IsComplete = reader.GetBoolean(1);
+                    homeTaskAssessment.Date = reader.GetDateTime(2);
+                    result.Add(homeTaskAssessment);
                 }
             }
 
@@ -59,12 +87,14 @@ INSERT INTO [dbo].[HomeTasks]
            ([Date]
            ,[Title]
            ,[Description]
-           ,[Number])
+           ,[Number]
+            ,[CourseId])
      VALUES
            (@Date
            ,@Title
            ,@Description
-           ,@Number);
+           ,@Number
+            ,@CourseId);
 SELECT CAST(scope_identity() AS int)
 ",
                     connection);
@@ -72,6 +102,7 @@ SELECT CAST(scope_identity() AS int)
                 sqlCommand.Parameters.AddWithNullableValue("@Title", homeTask.Title);
                 sqlCommand.Parameters.AddWithNullableValue("@Description", homeTask.Description);
                 sqlCommand.Parameters.AddWithNullableValue("@Number", homeTask.Number);
+                sqlCommand.Parameters.AddWithNullableValue("@CourseId", homeTask.CourseId);
 
                 int identity = (int)sqlCommand.ExecuteScalar();
                 if (identity == 0)
@@ -134,13 +165,13 @@ INSERT INTO [dbo].[HomeTaskAssessment]
            ,[StudentId])
      VALUES
            (@Date
-           ,@Title
-           ,@Description
-           ,@Number);
+           ,@IsComplete
+           ,@HomeTaskId
+           ,@StudentId);
 SELECT CAST(scope_identity() AS int)
 ", transaction.Connection, transaction);
                 sqlCommand.Parameters.AddWithNullableValue("@Date", homeTaskAssessment.Date);
-                sqlCommand.Parameters.AddWithNullableValue("@Title", homeTaskAssessment.IsComplete);
+                sqlCommand.Parameters.AddWithNullableValue("@IsComplete", homeTaskAssessment.IsComplete);
                 sqlCommand.Parameters.AddWithNullableValue("@HomeTaskId", homeTask.Id);
                 sqlCommand.Parameters.AddWithNullableValue("@StudentId", homeTaskAssessment.StudentId);
 
@@ -158,7 +189,7 @@ SELECT CAST(scope_identity() AS int)
         {
             using SqlConnection connection = GetConnection();
             SqlCommand sqlCommand = new SqlCommand(
-                $@"DELETE FROM [dbo].[HomeTask]
+                $@"DELETE FROM [dbo].[HomeTasks]
                 WHERE Id={id}", connection);
             sqlCommand.ExecuteNonQuery();
         }
