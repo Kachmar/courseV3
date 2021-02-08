@@ -10,6 +10,11 @@ namespace Services
     {
         private readonly IRepository<Student> _studentRepository;
 
+        public StudentService()
+        {
+            
+        }
+
         public StudentService(IRepository<Student> studentRepository)
         {
             this._studentRepository = studentRepository;

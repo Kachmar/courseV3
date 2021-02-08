@@ -9,6 +9,11 @@ namespace Services
         private readonly IRepository<Course> _courseRepository;
         private readonly IRepository<HomeTask> _homeTaskRepository;
 
+        public HomeTaskService()
+        {
+            
+        }
+
         public HomeTaskService(IRepository<Course> courseRepository, IRepository<HomeTask> homeTaskRepository)
         {
             this._courseRepository = courseRepository;
