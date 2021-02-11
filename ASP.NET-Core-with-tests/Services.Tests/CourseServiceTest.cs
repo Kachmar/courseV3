@@ -93,23 +93,21 @@ namespace Services.Tests
             var expectedCourse = GetDefaultCourse(10);
             expectedCourse.Students.Add(GetDefaultStudent(3));
             expectedCourse.Students.Add(GetDefaultStudent(4));
-            
-            actual.Should().BeEquivalentTo(expectedCourse);
-        }
 
-        private Student GetDefaultStudent(int id = 0)
-        {
-            return new Student()
-            {
-                Name = "Test",
-                Id = id
-            };
+            actual.Should().BeEquivalentTo(expectedCourse);
         }
 
         [Fact]
         public void SetStudentsToCourse_NoCourseExistWithGivenId_ThrowsException()
         {
+            //Arrange
+            var courseRepository = Substitute.For<IRepository<Course>>();
 
+            //courseRepository.GetById(Arg.Any<int>()).Returns(nu);
+            CourseService courseService = new CourseService(courseRepository, null);
+
+            //Act and Assert
+            Assert.Throws<ArgumentException>(() => { courseService.SetStudentsToCourse(5, new List<int>() {3}); });
         }
 
 
@@ -128,6 +126,14 @@ namespace Services.Tests
                 StartDate = new DateTime(2020, 1, 1),
                 Name = "Test",
                 PassCredits = 10
+            };
+        }
+        private Student GetDefaultStudent(int id = 0)
+        {
+            return new Student()
+            {
+                Name = "Test",
+                Id = id
             };
         }
     }

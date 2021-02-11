@@ -78,6 +78,7 @@ namespace Services
             }
             this._courseRepository.Update(course);
         }
+
         private ValidationResponse<Course> ValidateCourse(Course course)
         {
             if (course == null)

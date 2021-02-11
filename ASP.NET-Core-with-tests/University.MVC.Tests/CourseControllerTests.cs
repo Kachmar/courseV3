@@ -17,7 +17,7 @@ namespace University.MVC.Tests
     public class CourseControllerTests
     {
         [Fact]
-        public async Task Courses_ReturnsViewResult_WithListOfCourses()
+        public void Courses_ReturnsViewResult_WithListOfCourses()
         {
             // Arrange
             var courseServiceMock = Substitute.For<CourseService>();
@@ -34,7 +34,7 @@ namespace University.MVC.Tests
         }
 
         [Fact]
-        public async Task AssignStudents_ReturnsViewResult_WithViewModel()
+        public void AssignStudents_ReturnsViewResult_WithViewModel()
         {
             // Arrange
             var courseServiceMock = Substitute.For<CourseService>();
@@ -47,12 +47,11 @@ namespace University.MVC.Tests
             var result = controller.AssignStudents(0);
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
-            Assert.Throws<Exception>(() => { controller.AssignStudents(0); });
             Assert.IsAssignableFrom<CourseStudentAssignmentViewModel>(viewResult.ViewData.Model);
         }
 
         [Fact]
-        public async Task AssignStudents_ReturnsViewResult_WithCoursesAndStudentsAreAssigned()
+        public void AssignStudents_ReturnsViewResult_WithCoursesAndStudentsAreAssigned()
         {
             // Arrange
             const int courseId = 1;
@@ -98,13 +97,13 @@ namespace University.MVC.Tests
         }
 
         [Fact]
-        public async Task Create_ReturnsBadRequest_WhenCourseParameterIsNull()
+        public void Create_ReturnsBadRequest_WhenCourseParameterIsNull()
         {
 
         }
 
         [Fact]
-        public async Task Create_ReturnsViewResult_WhenModelStateIsInvalid()
+        public void Create_ReturnsViewResult_WhenModelStateIsInvalid()
         {
             // Arrange
             var courseServiceMock = Substitute.For<CourseService>();
@@ -119,29 +118,29 @@ namespace University.MVC.Tests
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
-            Assert.IsAssignableFrom<CourseStudentAssignmentViewModel>(viewResult.ViewData.Model);
+            Assert.IsAssignableFrom<Course>(viewResult.ViewData.Model);
         }
 
         [Fact]
-        public async Task Create_RedirectsToCoursesAndCreatesCourses_WhenRequestIsValid()
+        public void Create_RedirectsToCoursesAndCreatesCourses_WhenRequestIsValid()
         {
 
         }
 
         [Fact]
-        public async Task AssignStudents_ReturnsBadRequest_WhenNonExistingCourseId()
+        public void AssignStudents_ReturnsBadRequest_WhenNonExistingCourseId()
         {
 
         }
 
         [Fact]
-        public async Task AssignStudents_ReturnsBadRequest_WhenAssignmentViewModelIsEmpty()
+        public void AssignStudents_ReturnsBadRequest_WhenAssignmentViewModelIsEmpty()
         {
 
         }
 
         [Fact]
-        public async Task AssignStudents_SetStudentsToCoursesAndRedirectsToCourses_WhenCoursesAndStudentsAreAssigned()
+        public void AssignStudents_SetStudentsToCoursesAndRedirectsToCourses_WhenCoursesAndStudentsAreAssigned()
         {
 
         }
