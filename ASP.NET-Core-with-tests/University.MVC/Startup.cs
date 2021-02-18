@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using DataAccess.EF;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -36,18 +37,15 @@ namespace University.MVC
             services.AddScoped<CourseService>();
             services.AddScoped<HomeTaskService>();
             services.AddDbContext<UniversityContext>();
-            services.Add(ServiceDescriptor.Scoped(typeof(IRepository<>),typeof(UniversityRepository<>)));;
+            services.Add(ServiceDescriptor.Scoped(typeof(IRepository<>), typeof(UniversityRepository<>)));
+            services.AddScoped<IAuthorizationHandler, SameStudentRequirementAuthorizationHandler>();
             services.ConfigureApplicationCookie(p =>
             {
                 p.LoginPath = "/Security/Login";
-                p.Cookie.Name = "ASP.NET.Demo.App";
+                p.Cookie.Name = "University";
             });
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("UkrainiansOnly", builder =>
-                {
-                    builder.AddRequirements(new UkrainianRequirement());
-                });
                 options.AddPolicy("SameUserPolicy", builder =>
                 {
                     builder.AddRequirements(new SameStudentRequirement());
@@ -68,10 +66,9 @@ namespace University.MVC
             }
 
             app.UseStaticFiles();
-           this.CreateAdminUser(userManager, roleManager).Wait();
-
+            CreateAdminUser(userManager, roleManager).Wait();
             app.UseRouting();
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
@@ -86,10 +83,18 @@ namespace University.MVC
             UserManager<IdentityUser> userManager,
             RoleManager<IdentityRole> roleManager)
         {
-            IdentityUser identityUser = new IdentityUser("Admin@test.com") { Email = "Admin@test.com" };
-            var userRes = await userManager.CreateAsync(identityUser, "Qwerty1234!");
+            IdentityUser identityUser = new IdentityUser
+            {
+                Email = "Admin@test.com",
+                UserName = "Admin@test.com"
+            };
+            var userRes = await userManager.CreateAsync(identityUser, "SuperAdmin#1234");
             var rol = await roleManager.CreateAsync(new IdentityRole("Admin"));
             var res = await userManager.AddToRoleAsync(identityUser, "Admin");
+            var isInRole = await userManager.IsInRoleAsync(identityUser, "Admin");
+            var roles =await userManager.GetRolesAsync(identityUser);
+            var allRoles =await roleManager.Roles.ToListAsync();
+            var x = userManager.Options.SignIn.RequireConfirmedAccount;
         }
     }
 }

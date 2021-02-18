@@ -7,17 +7,17 @@ namespace DataAccess.EF
 
     public class UniversityContext : DbContext
     {
-        private readonly IOptions<RepositoryOptions> options;
+        private readonly IOptions<RepositoryOptions> _options;
 
         public UniversityContext(IOptions<RepositoryOptions> options)
         {
-            this.options = options;
+            _options = options;
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
-            optionsBuilder.UseSqlServer(options.Value.DefaultConnectionString);
+            optionsBuilder.UseSqlServer(_options.Value.DefaultConnectionString);
             optionsBuilder.UseLazyLoadingProxies();
         }
 

@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Models.Models;
 using Services;
 using University.MVC.ViewModels;
@@ -11,25 +14,25 @@ namespace University.MVC.Controllers
 {
     public class CourseController : Controller
     {
-        private readonly CourseService courseService;
-        private readonly StudentService studentService;
+        private readonly CourseService _courseService;
+        private readonly StudentService _studentService;
 
         public CourseController(CourseService courseService, StudentService studentService)
         {
-            this.courseService = courseService;
-            this.studentService = studentService;
+            _courseService = courseService;
+            _studentService = studentService;
         }
 
         // GET
-        public IActionResult Courses()
+        public async Task<IActionResult> Courses()
         {
-            return View(this.courseService.GetAllCourses());
+            return View(_courseService.GetAllCourses().Select(ToViewModel));
         }
 
         [Authorize(Roles = "Admin")]
         public IActionResult Delete(int id)
         {
-            this.courseService.DeleteCourse(id);
+            _courseService.DeleteCourse(id);
 
             return RedirectToAction("Courses");
         }
@@ -38,70 +41,70 @@ namespace University.MVC.Controllers
         public IActionResult Create()
         {
             ViewData["action"] = nameof(this.Create);
-            return this.View("Edit", new Course());
+            return View("Edit", new CourseViewModel());
         }
 
         [HttpGet]
         [Authorize(Roles = "Admin")]
         public IActionResult Edit(int id)
         {
-            Course course = this.courseService.GetCourseById(id);
+            var course = _courseService.GetCourseById(id);
             if (course == null)
             {
-                return this.NotFound();
+                return NotFound();
             }
 
             ViewData["action"] = nameof(this.Edit);
 
-            return this.View(course);
+            return View(ToViewModel(course));
         }
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public IActionResult Edit(Course courseParameter)
+        public IActionResult Edit(CourseViewModel courseParameter)
         {
             if (courseParameter == null)
             {
-                return this.BadRequest();
+                return BadRequest();
             }
-            courseService.UpdateCourse(courseParameter);
-            return this.RedirectToAction(nameof(Courses));
+            _courseService.UpdateCourse(ToModel(courseParameter));
+            return RedirectToAction(nameof(Courses));
         }
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public IActionResult Create(Course courseParameter)
+        public IActionResult Create(CourseViewModel courseParameter)
         {
             if (courseParameter == null)
             {
-                return this.BadRequest();
+                return BadRequest();
             }
             ViewData["action"] = nameof(this.Create);
             if (!ModelState.IsValid)
             {
-                return this.View("Edit", courseParameter);
+                return View("Edit", courseParameter);
             }
 
             try
             {
-                this.courseService.CreateCourse(courseParameter);
+                _courseService.CreateCourse(ToModel(courseParameter));
             }
             catch (Exception ex)
             {
                 ModelState.AddModelError("Name", ex.Message);
-                return this.View("Edit", courseParameter);
+                return View("Edit", courseParameter);
 
             }
 
-            return this.RedirectToAction(nameof(Courses));
+            return RedirectToAction(nameof(Courses));
         }
 
         [Authorize(Roles = "Admin")]
         [HttpGet]
         public IActionResult AssignStudents(int id)
         {
-            var allStudents = this.studentService.GetAllStudents();
-            var course = this.courseService.GetCourseById(id);
+            var allStudents = _studentService.GetAllStudents();
+            var course = _courseService.GetCourseById(id);
             if (course == null)
             {
                 return BadRequest();
@@ -113,24 +116,50 @@ namespace University.MVC.Controllers
             model.Name = course.Name;
             model.StartDate = course.StartDate;
             model.PassCredits = course.PassCredits;
-            model.Students = new List<StudentViewModel>();
+            model.Students = new List<AssignmentStudentViewModel>();
 
             foreach (var student in allStudents)
             {
                 bool isAssigned = course.Students.Any(p => p.Id == student.Id);
-                model.Students.Add(new StudentViewModel() { StudentId = student.Id, StudentFullName = student.Name, IsAssigned = isAssigned });
+                model.Students.Add(new AssignmentStudentViewModel() { StudentId = student.Id, StudentFullName = student.Name, IsAssigned = isAssigned });
             }
 
-            return this.View(model);
+            return View(model);
         }
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
         public IActionResult AssignStudents(CourseStudentAssignmentViewModel assignmentViewModel)
         {
-            this.courseService.SetStudentsToCourse(assignmentViewModel.Id, assignmentViewModel.Students.Where(p => p.IsAssigned).Select(student => student.StudentId));
+            _courseService.SetStudentsToCourse(assignmentViewModel.Id, assignmentViewModel.Students.Where(p => p.IsAssigned).Select(student => student.StudentId));
 
             return RedirectToAction("Courses");
+        }
+
+        private Course ToModel(CourseViewModel course)
+        {
+            return new Course()
+            {
+                EndDate = course.EndDate,
+                StartDate = course.StartDate,
+                Id = course.Id,
+                Name = course.Name,
+                PassCredits = course.PassCredits,
+                HomeTasks = course.HomeTasks.Select(HomeTaskController.ToModel).ToList()
+            };
+        }
+
+        private CourseViewModel ToViewModel(Course course)
+        {
+            return new CourseViewModel()
+            {
+                EndDate = course.EndDate,
+                StartDate = course.StartDate,
+                Id = course.Id,
+                Name = course.Name,
+                PassCredits = course.PassCredits,
+                HomeTasks = course.HomeTasks.Select(HomeTaskController.ToViewModel).ToList()
+            };
         }
     }
 }

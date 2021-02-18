@@ -9,48 +9,48 @@ namespace DataAccess.EF
 
     public class UniversityRepository<T> : IRepository<T> where T : class
     {
-    private readonly UniversityContext context;
-    protected DbSet<T> DBSet;
+    private readonly UniversityContext _context;
+    protected DbSet<T> DbSet;
 
     public UniversityRepository(UniversityContext context)
     {
-        this.context = context;
+        _context = context;
         context.Database.EnsureCreated();
-        this.DBSet = this.context.Set<T>();
+        DbSet = _context.Set<T>();
     }
 
     public List<T> GetAll()
     {
-        return this.DBSet.ToList();
+        return DbSet.ToList();
     }
 
     public T GetById(int id)
     {
-        return this.DBSet.Find(id);
+        return DbSet.Find(id);
     }
 
     public T Create(T entity)
     {
-        var result = this.DBSet.Add(entity);
-        context.SaveChanges();
+        var result = DbSet.Add(entity);
+        _context.SaveChanges();
         return entity;
     }
 
     public void Update(T entity)
     {
-        this.DBSet.Update(entity);
-        context.SaveChanges();
+        DbSet.Update(entity);
+        _context.SaveChanges();
     }
 
     public void Remove(T entity)
     {
-        this.DBSet.Remove(entity);
-        context.SaveChanges();
+        DbSet.Remove(entity);
+        _context.SaveChanges();
     }
 
     public void Remove(int id)
     {
-        var entity = this.GetById(id);
+        var entity = GetById(id);
         Remove(entity);
     }
     }

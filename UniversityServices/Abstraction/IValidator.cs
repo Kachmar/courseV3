@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Models.Models;
+﻿using Models.Models;
 using Services.Validators;
 
 namespace Services.Abstraction

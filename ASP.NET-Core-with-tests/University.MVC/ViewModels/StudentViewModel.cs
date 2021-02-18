@@ -1,9 +1,8 @@
-﻿namespace Models.Models
-{
-    using System;
-    using System.Collections.Generic;
+﻿using System;
 
-    public class Student
+namespace University.MVC.ViewModels
+{
+    public class StudentViewModel
     {
         public string Name { get; set; }
 
@@ -18,10 +17,6 @@
         public string GitHubLink { get; set; }
 
         public string Notes { get; set; }
-
-        public virtual List<HomeTaskAssessment> HomeTaskAssessments { get; set; } = new List<HomeTaskAssessment>();
-
-        public virtual List<Course> Courses { get; set; } = new List<Course>();
-
+        
     }
 }

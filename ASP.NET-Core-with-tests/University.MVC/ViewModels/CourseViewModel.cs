@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace University.MVC.ViewModels
 {
-    public class CourseStudentAssignmentViewModel
+    public class CourseViewModel
     {
         public string Name { get; set; }
 
@@ -15,15 +15,6 @@ namespace University.MVC.ViewModels
 
         public int PassCredits { get; set; }
 
-        public List<AssignmentStudentViewModel> Students { get; set; }
-    }
-
-    public class AssignmentStudentViewModel
-    {
-        public int StudentId { get; set; }
-
-        public string StudentFullName { get; set; }
-
-        public bool IsAssigned { get; set; }
+        public List<HomeTaskViewModel> HomeTasks { get; set; }
     }
 }

@@ -11,21 +11,18 @@ namespace University.MVC.Controllers
     [Authorize]
     public class SecurityController : Controller
     {
-        private readonly UserManager<IdentityUser> userManager;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        private readonly SignInManager<IdentityUser> signInManager;
+        private readonly SignInManager<IdentityUser> _signInManager;
 
-        private readonly RoleManager<IdentityRole> roleManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
         public SecurityController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, RoleManager<IdentityRole> roleManager)
         {
-            this.userManager = userManager;
-            this.signInManager = signInManager;
-            this.roleManager = roleManager;
+            _userManager = userManager;
+            _signInManager = signInManager;
+            _roleManager = roleManager;
         }
-
-        [TempData]
-        public string ErrorMessage { get; set; }
 
         [HttpGet]
         [AllowAnonymous]
@@ -44,8 +41,8 @@ namespace University.MVC.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
-                await signInManager.SignOutAsync();
-                var result = await signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
+                await _signInManager.SignOutAsync();
+                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
                     return RedirectToAction("Courses", "Course");
@@ -56,14 +53,13 @@ namespace University.MVC.Controllers
                     return View(model);
                 }
             }
-
             return View(model);
         }
 
         [HttpGet]
         public async Task<IActionResult> Logout()
         {
-            await signInManager.SignOutAsync();
+            await _signInManager.SignOutAsync();
             return RedirectToAction("Courses", "Course");
         }
 
@@ -74,7 +70,7 @@ namespace University.MVC.Controllers
         {
             if (ModelState.IsValid)
             {
-                var result = await this.userManager.CreateAsync(new IdentityUser(createUserViewModel.Email) { Email = createUserViewModel.Email }, createUserViewModel.Password);
+                var result = await _userManager.CreateAsync(new IdentityUser(createUserViewModel.Email) { Email = createUserViewModel.Email }, createUserViewModel.Password);
                 if (result.Succeeded)
                 {
                     return RedirectToAction("Users");
@@ -110,7 +106,7 @@ namespace University.MVC.Controllers
         {
             if (ModelState.IsValid)
             {
-                var result = await this.roleManager.CreateAsync(new IdentityRole(createRoleViewModel.Role));
+                var result = await _roleManager.CreateAsync(new IdentityRole(createRoleViewModel.Role));
                 if (result.Succeeded)
                 {
                     return RedirectToAction("Courses", "Course");
@@ -130,8 +126,8 @@ namespace University.MVC.Controllers
         public async Task<ActionResult> Users()
         {
 
-            UsersViewModel model = new UsersViewModel() { UserNames = this.userManager.Users.Select(p => p.Email).ToList() };
-            return this.View(model);
+            UsersViewModel model = new UsersViewModel() { UserNames = _userManager.Users.Select(p => p.Email).ToList() };
+            return View(model);
         }
 
         [Authorize(Roles = "Admin")]
@@ -139,18 +135,18 @@ namespace University.MVC.Controllers
         public async Task<ActionResult> AssignUserRole(string userName)
         {
             AssignUserRoleViewModel model = new AssignUserRoleViewModel();
-            var user = this.userManager.Users.SingleOrDefault(p => p.Email == userName);
+            var user = _userManager.Users.SingleOrDefault(p => p.Email == userName);
             if (user == null)
             {
-                return this.NotFound();
+                return NotFound();
             }
 
-            foreach (var role in this.roleManager.Roles)
+            foreach (var role in _roleManager.Roles)
             {
                 model.UserRoles.Add(new UserRoleViewModel()
                 {
                     RoleName = role.Name,
-                    IsAssigned = await this.userManager.IsInRoleAsync(user, role.Name)
+                    IsAssigned = await _userManager.IsInRoleAsync(user, role.Name)
                 });
             }
 
@@ -161,17 +157,17 @@ namespace University.MVC.Controllers
         [HttpPost]
         public async Task<ActionResult> AssignUserRole(AssignUserRoleViewModel model)
         {
-            var user = this.userManager.Users.SingleOrDefault(p => p.Email == model.UserName);
+            var user = _userManager.Users.SingleOrDefault(p => p.Email == model.UserName);
             foreach (var userRoleViewModel in model.UserRoles)
             {
-                if (await this.userManager.IsInRoleAsync(user, userRoleViewModel.RoleName))
+                if (await _userManager.IsInRoleAsync(user, userRoleViewModel.RoleName))
                 {
-                    await this.userManager.RemoveFromRoleAsync(user, userRoleViewModel.RoleName);
+                    await _userManager.RemoveFromRoleAsync(user, userRoleViewModel.RoleName);
                 }
 
                 if (userRoleViewModel.IsAssigned)
                 {
-                    var result = await this.userManager.AddToRoleAsync(user, userRoleViewModel.RoleName);
+                    var result = await _userManager.AddToRoleAsync(user, userRoleViewModel.RoleName);
                 }
             }
 

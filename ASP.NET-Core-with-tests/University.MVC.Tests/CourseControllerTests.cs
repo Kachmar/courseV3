@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Models.Models;
 using NSubstitute;
@@ -21,7 +19,7 @@ namespace University.MVC.Tests
         {
             // Arrange
             var courseServiceMock = Substitute.For<CourseService>();
-            courseServiceMock.GetAllCourses().Returns(this.GetCoursesList());
+            courseServiceMock.GetAllCourses().Returns(GetCoursesList());
             var controller = new CourseController(courseServiceMock, null);
 
             // Act
@@ -63,10 +61,10 @@ namespace University.MVC.Tests
             {
                 Id = courseId,
                 Name = courseName,
-                Students = new List<StudentViewModel>()
+                Students = new List<AssignmentStudentViewModel>()
                                                                                      {
-                                                                                         new StudentViewModel(){StudentId = assignedStudentId,StudentFullName = "Test1", IsAssigned = true},
-                                                                                         new StudentViewModel(){StudentId = nonAssignedStudentId,StudentFullName = "Test2", IsAssigned = false}
+                                                                                         new AssignmentStudentViewModel(){StudentId = assignedStudentId,StudentFullName = "Test1", IsAssigned = true},
+                                                                                         new AssignmentStudentViewModel(){StudentId = nonAssignedStudentId,StudentFullName = "Test2", IsAssigned = false}
                                                                                      }
             };
             var courseServiceMock = Substitute.For<CourseService>();
@@ -113,8 +111,9 @@ namespace University.MVC.Tests
             var controller = new CourseController(courseServiceMock, studentService);
 
             controller.ModelState.AddModelError("s", "v");
+
             // Act
-            var result = controller.Create(new Course());
+            var result = controller.Create(new CourseViewModel());
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);

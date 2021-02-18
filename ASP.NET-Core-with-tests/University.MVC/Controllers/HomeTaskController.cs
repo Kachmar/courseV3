@@ -12,13 +12,13 @@ namespace University.MVC.Controllers
 {
     public class HomeTaskController : Controller
     {
-        private readonly HomeTaskService homeTaskService;
-        private readonly StudentService studentService;
+        private readonly HomeTaskService _homeTaskService;
+        private readonly StudentService _studentService;
 
         public HomeTaskController(HomeTaskService homeTaskService, StudentService studentService)
         {
-            this.homeTaskService = homeTaskService;
-            this.studentService = studentService;
+            _homeTaskService = homeTaskService;
+            _studentService = studentService;
         }
 
         [HttpGet]
@@ -27,13 +27,13 @@ namespace University.MVC.Controllers
         {
             ViewData["Action"] = "Create";
             ViewData["CourseId"] = courseId;
-            var model = new HomeTask();
+            var model = new HomeTaskViewModel();
             return View("Edit", model);
         }
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public IActionResult Create(HomeTask homeTask, int courseId)
+        public IActionResult Create(HomeTaskViewModel homeTask, int courseId)
         {
             if (!ModelState.IsValid)
             {
@@ -44,7 +44,7 @@ namespace University.MVC.Controllers
             var routeValueDictionary = new RouteValueDictionary();
             routeValueDictionary.Add("id", courseId);
 
-            this.homeTaskService.CreateHomeTask(homeTask);
+            _homeTaskService.CreateHomeTask(ToModel(homeTask));
             return RedirectToAction("Edit", "Course", routeValueDictionary);
         }
 
@@ -52,17 +52,17 @@ namespace University.MVC.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult Edit(int id)
         {
-            HomeTask homeTask = this.homeTaskService.GetHomeTaskById(id);
+            HomeTask homeTask = _homeTaskService.GetHomeTaskById(id);
             if (homeTask == null)
-                return this.NotFound();
+                return NotFound();
             ViewData["Action"] = "Edit";
 
-            return View(homeTask);
+            return View(ToViewModel(homeTask));
         }
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public IActionResult Edit(HomeTask homeTaskParameter)
+        public IActionResult Edit(HomeTaskViewModel homeTaskParameter)
         {
             if (!ModelState.IsValid)
             {
@@ -71,10 +71,10 @@ namespace University.MVC.Controllers
                 return View(homeTaskParameter);
             }
 
-            var homeTask = this.homeTaskService.GetHomeTaskById(homeTaskParameter.Id);
+            var homeTask = _homeTaskService.GetHomeTaskById(homeTaskParameter.Id);
 
             var routeValueDictionary = new RouteValueDictionary();
-            this.homeTaskService.UpdateHomeTask(homeTaskParameter);
+            _homeTaskService.UpdateHomeTask(ToModel(homeTaskParameter));
             routeValueDictionary.Add("id", homeTask.Course.Id);
             return RedirectToAction("Edit", "Course", routeValueDictionary);
         }
@@ -83,7 +83,7 @@ namespace University.MVC.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult Delete(int homeTaskId, int courseId)
         {
-            this.homeTaskService.DeleteHomeTask(homeTaskId);
+            _homeTaskService.DeleteHomeTask(homeTaskId);
 
             var routeValueDictionary = new RouteValueDictionary();
             routeValueDictionary.Add("id", courseId);
@@ -94,11 +94,11 @@ namespace University.MVC.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult Evaluate(int id)
         {
-            var homeTask = this.homeTaskService.GetHomeTaskById(id);
+            var homeTask = _homeTaskService.GetHomeTaskById(id);
 
             if (homeTask == null)
             {
-                return this.NotFound();
+                return NotFound();
             }
 
             HomeTaskAssessmentViewModel assessmentViewModel =
@@ -134,17 +134,17 @@ namespace University.MVC.Controllers
                 }
             }
 
-            return this.View(assessmentViewModel);
+            return View(assessmentViewModel);
         }
 
         [Authorize(Roles = "Admin")]
         public IActionResult SaveEvaluation(HomeTaskAssessmentViewModel model)
         {
-            var homeTask = this.homeTaskService.GetHomeTaskById(model.HomeTaskId);
+            var homeTask = _homeTaskService.GetHomeTaskById(model.HomeTaskId);
 
             if (homeTask == null)
             {
-                return this.NotFound();
+                return NotFound();
             }
 
             foreach (var homeTaskStudent in model.HomeTaskStudents)
@@ -157,7 +157,7 @@ namespace University.MVC.Controllers
                 }
                 else
                 {
-                    var student = this.studentService.GetStudentById(homeTaskStudent.StudentId);
+                    var student = _studentService.GetStudentById(homeTaskStudent.StudentId);
                     homeTask.HomeTaskAssessments.Add(new HomeTaskAssessment
                     {
                         HomeTask = homeTask,
@@ -167,9 +167,35 @@ namespace University.MVC.Controllers
 
                     });
                 }
-                this.homeTaskService.UpdateHomeTask(homeTask);
+                _homeTaskService.UpdateHomeTask(homeTask);
             }
             return RedirectToAction("Courses", "Course");
+        }
+
+        public static HomeTaskViewModel ToViewModel(HomeTask homeTask)
+        {
+            return new HomeTaskViewModel()
+            {
+                CourseId = homeTask.CourseId,
+                Id = homeTask.Id,
+                Number = homeTask.Number,
+                Date = homeTask.Date,
+                Description = homeTask.Description,
+                Title = homeTask.Title
+            };
+        }
+
+        public static HomeTask ToModel(HomeTaskViewModel homeTask)
+        {
+            return new HomeTask()
+            {
+                CourseId = homeTask.CourseId,
+                Id = homeTask.Id,
+                Number = homeTask.Number,
+                Date = homeTask.Date,
+                Description = homeTask.Description,
+                Title = homeTask.Title
+            };
         }
     }
 }

@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Models;
 using Models.Models;
-using Services.Abstraction;
 using Services.Validators;
 
 namespace Services
@@ -31,12 +29,12 @@ namespace Services
 
         public virtual void DeleteCourse(int id)
         {
-            this._courseRepository.Remove(id);
+            _courseRepository.Remove(id);
         }
 
         public virtual Course GetCourseById(int id)
         {
-            return this._courseRepository.GetById(id);
+            return _courseRepository.GetById(id);
         }
 
         public virtual ValidationResponse UpdateCourse(Course course)
@@ -46,7 +44,7 @@ namespace Services
             {
                 return response;
             }
-            this._courseRepository.Update(course);
+            _courseRepository.Update(course);
             return new ValidationResponse();
         }
 
@@ -58,25 +56,25 @@ namespace Services
                 return response;
             }
 
-            var all = this._courseRepository.GetAll();
+            var all = _courseRepository.GetAll();
             if (all.Any(p => p.Name == course.Name))
             {
                 return new ValidationResponse<Course>("name", $"course with name '{course.Name}' already exists.");
             }
-            var newCourse = this._courseRepository.Create(course);
+            var newCourse = _courseRepository.Create(course);
             return new ValidationResponse<Course>(newCourse);
         }
 
         public virtual void SetStudentsToCourse(int courseId, IEnumerable<int> studentIds)
         {
-            var course = this._courseRepository.GetById(courseId);
+            var course = _courseRepository.GetById(courseId);
             course.Students.Clear();
             foreach (var studentId in studentIds)
             {
-                var student = this._studentRepository.GetById(studentId);
+                var student = _studentRepository.GetById(studentId);
                 course.Students.Add(student);
             }
-            this._courseRepository.Update(course);
+            _courseRepository.Update(course);
         }
 
         private ValidationResponse<Course> ValidateCourse(Course course)

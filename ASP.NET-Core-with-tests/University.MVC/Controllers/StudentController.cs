@@ -1,67 +1,69 @@
 ﻿
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.Models;
 using Services;
+using University.MVC.ViewModels;
 
 namespace University.MVC.Controllers
 {
     public class StudentController : Controller
     {
-        private readonly StudentService studentService;
-        private readonly IAuthorizationService authorizationService;
+        private readonly StudentService _studentService;
+        private readonly IAuthorizationService _authorizationService;
 
         public StudentController(StudentService studentService, IAuthorizationService authorizationService)
         {
-            this.studentService = studentService;
-            this.authorizationService = authorizationService;
+            _studentService = studentService;
+            _authorizationService = authorizationService;
         }
 
         // GET
         public IActionResult Students()
         {
-            return View(studentService.GetAllStudents());
+            return View(_studentService.GetAllStudents().Select(ToViewModel));
         }
 
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            var student = studentService.GetStudentById(id);
-            var result = await authorizationService.AuthorizeAsync(User, student, "SameUserPolicy");
+            var student = _studentService.GetStudentById(id);
+            var result = await _authorizationService.AuthorizeAsync(User, student, "SameUserPolicy");
             if (result.Succeeded)
             {
                 ViewData["Action"] = "Edit";
-                return this.View(student);
+                return View(ToViewModel(student));
             }
 
-            return Unauthorized();
+            return Forbid();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(Student model)
+        public async Task<IActionResult> Edit(StudentViewModel student)
         {
             if (!ModelState.IsValid)
             {
                 ViewData["Action"] = "Edit";
-                return this.View("Edit", model);
+                return View("Edit", student);
             }
 
-            var result = await authorizationService.AuthorizeAsync(User, model, "SameUserPolicy");
+            var result = await _authorizationService.AuthorizeAsync(User, student, "SameUserPolicy");
             if (result.Succeeded)
             {
-                this.studentService.UpdateStudent(model);
+                _studentService.UpdateStudent(ToModel(student));
 
                 return RedirectToAction("Students");
             }
-            return Unauthorized();
+            return Forbid();
         }
 
         [HttpGet]
         [Authorize(Roles = "Admin")]
         public IActionResult Delete(int id)
         {
-            this.studentService.DeleteStudent(id);
+            _studentService.DeleteStudent(id);
             return RedirectToAction("Students");
         }
 
@@ -70,23 +72,50 @@ namespace University.MVC.Controllers
         public IActionResult Create()
         {
             ViewData["Action"] = "Create";
-            var student = new Student();
-            return this.View("Edit", student);
+            var student = new StudentViewModel();
+            return View("Edit", student);
         }
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public IActionResult Create(Student model)
+        public IActionResult Create(StudentViewModel student)
         {
             if (!ModelState.IsValid)
             {
                 ViewData["Action"] = "Create";
-                return this.View("Edit", model);
+                return View("Edit", student);
             }
 
-            this.studentService.CreateStudent(model);
+            _studentService.CreateStudent(ToModel(student));
             return RedirectToAction("Students");
+        }
 
+        private Student ToModel(StudentViewModel student)
+        {
+            return new Student()
+            {
+                BirthDate = student.BirthDate,
+                Email = student.Email,
+                GitHubLink = student.GitHubLink,
+                Id = student.Id,
+                Name = student.Name,
+                Notes = student.Notes,
+                PhoneNumber = student.PhoneNumber
+            };
+        }
+
+        private StudentViewModel ToViewModel(Student student)
+        {
+            return new StudentViewModel()
+            {
+                BirthDate = student.BirthDate,
+                Email = student.Email,
+                GitHubLink = student.GitHubLink,
+                Id = student.Id,
+                Name = student.Name,
+                Notes = student.Notes,
+                PhoneNumber = student.PhoneNumber
+            };
         }
     }
 }
