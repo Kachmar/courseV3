@@ -27,20 +27,22 @@ namespace University.MVC.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> Edit(int id)
         {
             var student = _studentService.GetStudentById(id);
-            var result = await _authorizationService.AuthorizeAsync(User, student, "SameUserPolicy");
-            if (result.Succeeded)
-            {
+            //var result = await _authorizationService.AuthorizeAsync(User, student, "SameUserPolicy");
+            //if (result.Succeeded)
+            //{
                 ViewData["Action"] = "Edit";
                 return View(ToViewModel(student));
-            }
+          //  }
 
             return Forbid();
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> Edit(StudentViewModel student)
         {
             if (!ModelState.IsValid)
@@ -49,13 +51,13 @@ namespace University.MVC.Controllers
                 return View("Edit", student);
             }
 
-            var result = await _authorizationService.AuthorizeAsync(User, student, "SameUserPolicy");
-            if (result.Succeeded)
-            {
+            //var result = await _authorizationService.AuthorizeAsync(User, student, "SameUserPolicy");
+            //if (result.Succeeded)
+            //{
                 _studentService.UpdateStudent(ToModel(student));
 
                 return RedirectToAction("Students");
-            }
+           // }
             return Forbid();
         }
 

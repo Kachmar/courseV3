@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Models;
 using Models.Models;
@@ -10,16 +11,23 @@ namespace Services
     {
         private readonly IRepository<Course> _courseRepository;
         private readonly IRepository<Student> _studentRepository;
+        private readonly IRepository<HomeTask> _homeTaskRepository;
+        private readonly IRepository<HomeTaskAssessment> _homeTaskAssessmentRepository;
 
         public CourseService()
         {
 
         }
 
-        public CourseService(IRepository<Course> courseRepository, IRepository<Student> studentRepository)
+        public CourseService(IRepository<Course> courseRepository,
+            IRepository<Student> studentRepository,
+            IRepository<HomeTask> homeTaskRepository,
+            IRepository<HomeTaskAssessment> homeTaskAssessmentRepository)
         {
             _courseRepository = courseRepository;
             _studentRepository = studentRepository;
+            _homeTaskRepository = homeTaskRepository;
+            _homeTaskAssessmentRepository = homeTaskAssessmentRepository;
         }
 
         public virtual List<Course> GetAllCourses()
@@ -29,6 +37,21 @@ namespace Services
 
         public virtual void DeleteCourse(int id)
         {
+            var course = _courseRepository.GetById(id);
+            if (course == null)
+            {
+                throw new Exception($"Cannot find course with id '{id}'");
+            }
+
+            foreach (var homeTask in course.HomeTasks.ToArray())
+            {
+                foreach (var homeTaskHomeTaskAssessment in homeTask.HomeTaskAssessments.ToArray())
+                {
+                    _homeTaskAssessmentRepository.Remove(homeTaskHomeTaskAssessment.Id);
+                }
+                _homeTaskRepository.Remove(homeTask.Id);
+            }
+
             _courseRepository.Remove(id);
         }
 

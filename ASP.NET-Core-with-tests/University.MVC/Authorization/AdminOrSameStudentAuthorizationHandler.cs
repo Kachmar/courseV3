@@ -15,7 +15,6 @@ namespace University.MVC.Authorization
             SameStudentRequirement requirement,
             StudentViewModel student)
         {
-            context.Succeed(requirement);
             if (context.User.IsInRole("Admin"))
             {
                 context.Succeed(requirement);

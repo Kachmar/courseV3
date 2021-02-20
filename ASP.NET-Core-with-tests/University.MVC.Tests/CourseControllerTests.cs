@@ -10,8 +10,6 @@ using FluentAssertions;
 
 namespace University.MVC.Tests
 {
-
-
     public class CourseControllerTests
     {
         [Fact]

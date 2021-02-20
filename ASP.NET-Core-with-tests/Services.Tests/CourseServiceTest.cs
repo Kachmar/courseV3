@@ -20,7 +20,7 @@ namespace Services.Tests
             var insertedCourse = GetDefaultCourse(5);
             courseRepository.Create(courseToInsert).Returns(insertedCourse);
             courseRepository.GetAll().Returns(new List<Course>());
-            CourseService courseService = new CourseService(courseRepository, null);
+            CourseService courseService = new CourseService(courseRepository, null, null, null);
 
             //Act
             var createdCourse = courseService.CreateCourse(courseToInsert);
@@ -37,7 +37,7 @@ namespace Services.Tests
             //Arrange
             Course courseToInsert = GetDefaultCourse();
             courseToInsert.StartDate = new DateTime(2024, 1, 1);
-            CourseService courseService = new CourseService(null, null);
+            CourseService courseService = new CourseService(null, null, null, null);
 
             //Act
             var createdCourse = courseService.CreateCourse(courseToInsert);
@@ -55,7 +55,7 @@ namespace Services.Tests
             Course courseToInsert = GetDefaultCourse();
             var courseRepository = Substitute.For<IRepository<Course>>();
             courseRepository.GetAll().Returns(new List<Course>() { courseToInsert });
-            CourseService courseService = new CourseService(courseRepository, null);
+            CourseService courseService = new CourseService(courseRepository, null, null, null);
 
             //Act
             var createdCourse = courseService.CreateCourse(courseToInsert);
@@ -77,7 +77,7 @@ namespace Services.Tests
 
             studentRepository.GetById(3).Returns(GetDefaultStudent(3));
             studentRepository.GetById(4).Returns(GetDefaultStudent(4));
-            CourseService courseService = new CourseService(courseRepository, studentRepository);
+            CourseService courseService = new CourseService(courseRepository, studentRepository, null, null);
             Course actual = null;
             courseRepository
                 .WhenForAnyArgs(a => a.Update(null))
@@ -103,10 +103,10 @@ namespace Services.Tests
             var courseRepository = Substitute.For<IRepository<Course>>();
 
             //courseRepository.GetById(Arg.Any<int>()).Returns(nu);
-            CourseService courseService = new CourseService(courseRepository, null);
+            CourseService courseService = new CourseService(courseRepository, null, null, null);
 
             //Act and Assert
-            Assert.Throws<ArgumentException>(() => { courseService.SetStudentsToCourse(5, new List<int>() {3}); });
+            Assert.Throws<ArgumentException>(() => { courseService.SetStudentsToCourse(5, new List<int>() { 3 }); });
         }
 
 

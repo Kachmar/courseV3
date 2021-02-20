@@ -43,6 +43,7 @@ namespace University.MVC
             {
                 p.LoginPath = "/Security/Login";
                 p.Cookie.Name = "University";
+                p.AccessDeniedPath = "/Security/AccessDenied";
             });
             services.AddAuthorization(options =>
             {

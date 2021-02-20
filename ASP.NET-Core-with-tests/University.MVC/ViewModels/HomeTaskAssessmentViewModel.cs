@@ -11,7 +11,7 @@ namespace University.MVC.ViewModels
 
         public string Description { get; set; }
 
-        public List<HomeTaskStudentViewModel> HomeTaskStudents { get; set; }
+        public List<HomeTaskStudentViewModel> HomeTaskStudents { get; set; } = new List<HomeTaskStudentViewModel>();
 
         public int HomeTaskId { get; set; }
     }

@@ -1,4 +1,5 @@
-﻿using Models.Models;
+﻿using System;
+using Models.Models;
 
 namespace DataAccess.EF
 {
@@ -20,12 +21,6 @@ namespace DataAccess.EF
             optionsBuilder.UseSqlServer(_options.Value.DefaultConnectionString);
             optionsBuilder.UseLazyLoadingProxies();
         }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
-        }
-
 
         public DbSet<Student> Students { get; set; }
 

@@ -1,4 +1,5 @@
-﻿using Models.Models;
+﻿using System;
+using Models.Models;
 using System.Collections.Generic;
 using Models;
 
@@ -7,15 +8,18 @@ namespace Services
     public class StudentService
     {
         private readonly IRepository<Student> _studentRepository;
+        private readonly IRepository<HomeTaskAssessment> _homeTaskAssessmentRepository;
 
         public StudentService()
         {
-            
+
         }
 
-        public StudentService(IRepository<Student> studentRepository)
+        public StudentService(IRepository<Student> studentRepository,
+            IRepository<HomeTaskAssessment> homeTaskAssessmentRepository)
         {
             _studentRepository = studentRepository;
+            _homeTaskAssessmentRepository = homeTaskAssessmentRepository;
         }
 
         public virtual List<Student> GetAllStudents()
@@ -35,6 +39,17 @@ namespace Services
 
         public virtual void DeleteStudent(int id)
         {
+            var student = _studentRepository.GetById(id);
+            if (student == null)
+            {
+                throw new Exception($"Cannot find student with id '{id}'");
+            }
+
+            foreach (var studentHomeTaskAssessment in student.HomeTaskAssessments.ToArray())
+            {
+                _homeTaskAssessmentRepository.Remove(studentHomeTaskAssessment.Id);
+            }
+
             _studentRepository.Remove(id);
         }
 

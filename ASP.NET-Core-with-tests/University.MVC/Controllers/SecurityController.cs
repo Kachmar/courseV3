@@ -173,5 +173,10 @@ namespace University.MVC.Controllers
 
             return RedirectToAction("Users");
         }
+
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
     }
 }
