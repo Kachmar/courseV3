@@ -49,7 +49,7 @@ namespace University.MVC
             {
                 options.AddPolicy("SameUserPolicy", builder =>
                 {
-                    builder.AddRequirements(new SameStudentRequirement());
+                    builder.Requirements.Add(new SameStudentRequirement());
                 });
             });
         }
