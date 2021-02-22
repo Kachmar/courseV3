@@ -7,39 +7,56 @@ using System.Threading.Tasks;
 namespace Delegates
 {
     class FuncPredicateAction
-
     {
         static void Main(string[] args)
         {
             MathInvoke(Add, 3, 5);
-            MathInvoke(Substract, 10, 3);
-            EvaluateInvoke(IsGreaterEnough, 500);
+            MathInvoke(Subtract, 10, 3);
+            EvaluateInvoke(IsGreatEnough, 500);
+            EvaluateInvoke(IsGreatEnough, 2000);
             Console.ReadLine();
         }
 
-        public static string Add(int x, int y)
+        private static string Add(int x, int y)
         {
             return (x + y).ToString();
         }
 
-        public static string Substract(int x, int y)
+        private static string Subtract(int x, int y)
         {
-            return (x + y).ToString();
+            return (x - y).ToString();
         }
 
-        public static bool IsGreaterEnough(int x)
+        private static string Multiply(int x, int y)
+        {
+            return (x * y).ToString();
+        }
+
+        private static bool IsGreatEnough(int x)
         {
             return x > 1000;
         }
 
-        public static void MathInvoke(Func<int, int, string> mathFunc, int x, int y)
+        //private static void MathInvoke(Func<int, int, string> mathFunc, int x, int y, Action<string> writer)
+        //{
+        //    var result = mathFunc(x, y);
+        //    writer(result);
+        //}
+        private static void MathInvoke(Func<int, int, string> mathFunc, int x, int y)
         {
-            Console.WriteLine(mathFunc.Invoke(x, y));
+            var result = mathFunc(x, y);
+            Console.WriteLine($"Math Result: {result}");
         }
 
-        public static void EvaluateInvoke(Predicate<int> predicateFunc, int x)
+        private static void EvaluateInvoke(Predicate<int> predicateFunc, int x)
         {
-            Console.WriteLine($"is great enough: {predicateFunc.Invoke(x)}");
+            var result = predicateFunc(x);
+            Console.WriteLine($"is great enough: {result}");
         }
+
+        //private static void WriteFancy(string text)
+        //{
+        //    Console.WriteLine($"Fancy output: {text}");
+        //}
     }
 }

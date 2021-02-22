@@ -23,10 +23,13 @@ namespace Delegates
             Console.WriteLine("Hit enter to remove SMS sender");
             // Console.ReadLine( );
             jokeGenerator.UnSubscribe(smsSender.SmsJoke);
-
+            //emailSender = null;
+            //smsSender = null;
+            //jokeGenerator = null;
+            ////Please pay attention to this memory leak case: we have explicitly set jokeGenerator to null, but events still occur, so Timer object lives in memory, and the object, that contain handling method live as well
+            //GC.Collect();
             Console.ReadLine();
         }
-
     }
 
     public class EmailSender
@@ -52,15 +55,15 @@ namespace Delegates
                                                    @"Anton, do you think I’m a bad mother? My name is Paul"
                                                 };
 
-        public void Subscribe(DelegatesMimicinEvents.Joke jokeDelegate)
+        public void Subscribe(DelegatesMimicinEvents.Joke jokeMethod)
         {
-            Delegate mainDel = System.Delegate.Combine(jokeDelegate, this.jokeDelegate);
+            Delegate mainDel = System.Delegate.Combine(jokeMethod, this.jokeDelegate);
             this.jokeDelegate = mainDel as DelegatesMimicinEvents.Joke;
         }
 
-        public void UnSubscribe(DelegatesMimicinEvents.Joke jokeDelegate)
+        public void UnSubscribe(DelegatesMimicinEvents.Joke jokeMethod)
         {
-            Delegate mainDel = System.Delegate.Remove(this.jokeDelegate, jokeDelegate);
+            Delegate mainDel = System.Delegate.Remove(this.jokeDelegate, jokeMethod);
             this.jokeDelegate = mainDel as DelegatesMimicinEvents.Joke;
         }
 

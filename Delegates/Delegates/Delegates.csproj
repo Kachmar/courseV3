@@ -6,11 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="ActionMimicinEvents.cs" />
     <Compile Remove="AnonymousFuncs.cs" />
     <Compile Remove="Delegates.cs" />
+    <Compile Remove="DelegatesMimicinEvents.cs" />
     <Compile Remove="Events.cs" />
-    <Compile Remove="Extensions.cs" />
     <Compile Remove="FuncPredicateAction.cs" />
     <Compile Remove="Lambda.cs" />
     <Compile Remove="Variance.cs" />
