@@ -81,13 +81,7 @@ namespace XML
 
         private static DateTime ImportStudentBirthday(XElement student)
         {
-            string date = student.Element("BirthDate").Value;
-            string[] splitDate = date.Split('.');
-            int year = int.Parse(splitDate[2]);
-            int month = int.Parse(splitDate[1]);
-            int day = int.Parse(splitDate[0]);
-
-            return new DateTime(year, month, day);
+            return DateTime.Parse(student.Element("BirthDate").Value);
         }
 
         private static void ProcessExtraData(Student importStudent, IEnumerable<XElement> extraDataElements)

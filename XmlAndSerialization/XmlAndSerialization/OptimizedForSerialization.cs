@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Newtonsoft.Json;
 
 namespace XML
 {
@@ -16,11 +17,18 @@ namespace XML
     {
         static void Main(string[] args)
         {
-            List<Student> ImportStudents = new List<Student>();
+            List<Student> importStudents = new List<Student>();
 
-            Import(ImportStudents);
-            XmlSerialize(ImportStudents);
-            var result = Export(ImportStudents);
+            Import(importStudents);
+            XmlSerialize(importStudents);
+            JsonSerialize(importStudents);
+            BinarySerialize(importStudents);
+            var result = Export(importStudents);
+        }
+        private static void JsonSerialize(List<Student> importStudents)
+        {
+            var json = JsonConvert.SerializeObject(importStudents);
+            File.WriteAllText("people.json", json);
         }
 
         private static void XmlSerialize(List<Student> importStudents)
@@ -134,7 +142,8 @@ namespace XML
         public List<ExtraData> ExtraData { get; }
         public List<string> Courses { get; }
         public string LastName { get; set; }
-
+        //[JsonProperty("name")]
+        //[JsonIgnore]
         public string FirstName { get; set; }
 
         public DateTime Birthday { get; set; }
