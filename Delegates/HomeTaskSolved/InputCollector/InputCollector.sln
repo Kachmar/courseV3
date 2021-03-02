@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30804.86
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InputCollector", "InputCollector\InputCollector.csproj", "{7DE9A3DE-4E0D-451E-8338-04170B3AC012}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7DE9A3DE-4E0D-451E-8338-04170B3AC012}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7DE9A3DE-4E0D-451E-8338-04170B3AC012}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7DE9A3DE-4E0D-451E-8338-04170B3AC012}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7DE9A3DE-4E0D-451E-8338-04170B3AC012}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4A27E471-A976-4E43-8624-5BDC18500EF2}
+	EndGlobalSection
+EndGlobal
