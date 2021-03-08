@@ -3,37 +3,26 @@ using System.Threading;
 
 class ThreadTest
 {
-    //static void Main()
-    //{
-    //    Thread t = new Thread(WriteY);
-    //    t.Start();
-    //    // Kick off a new thread
-    //    // running WriteY()
-    //    // Simultaneously, do something on the main thread.
-    //    for (int i = 0; i < 1000; i++)
-    //    {
-    //        Console.Write("x");
-    //    }
-    //}
-    //static void WriteY()
-    //{
-    //    for (int i = 0; i < 1000; i++)
-    //    {
-    //        Console.Write("y");
-    //    }
-    //}
-
     static void Main()
     {
-        Thread t = new Thread(Go);
+        Thread t = new Thread(WriteY);
         t.Name = "TestName";
         t.Start();
-        //try comment next line and see what happens
-        t.Join();
-        Console.WriteLine("Thread t has ended!");
+        // Kick off a new thread
+        // running WriteY()
+        // Simultaneously, do something on the main thread.
+        //try uncomment next line and see what happens
+        //t.Join();
+        for (int i = 0; i < 1000; i++)
+        {
+            Console.Write("x");
+        }
     }
-    static string Go()
+    static void WriteY()
     {
-        return "Some result";
-    }
+        for (int i = 0; i < 1000; i++)
+        {
+            Console.Write("y");
+        }
+    }  
 }

@@ -20,6 +20,9 @@ namespace AsynchronouseProgramming
             SumCalculator sumCalculator = new SumCalculator();
             var first = new Thread(() => { sumCalculator.Calculate(1, 495, null); });
             var second = new Thread(() => { sumCalculator.Calculate(495, 500, null); });
+
+            //TODO Add logic here
+
             Console.WriteLine(result);
             Console.ReadLine();
         }
