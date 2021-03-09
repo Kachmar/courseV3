@@ -9,10 +9,13 @@ namespace AsynchronouseProgramming
         {
             for (int i = 0; i < 10; i++)
             {
-                new Thread(
-                    () => Console.Write(i+",")
-                    ).Start();
+                new Thread(() =>
+                {
+                    Console.WriteLine(i + ",");
+                }).Start();
             }
+
+            Console.ReadLine();
         }
 
         //FIX
@@ -23,6 +26,8 @@ namespace AsynchronouseProgramming
         //        int temp = i;
         //        new Thread(() => Console.Write(temp)).Start();
         //    }
+       // Console.ReadLine();
+
         //}
     }
 }
