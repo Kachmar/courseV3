@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Models;
 using Models.Models;
+using Services.Validators;
 
 namespace Services
 {
@@ -11,7 +14,7 @@ namespace Services
 
         public HomeTaskService()
         {
-            
+
         }
 
         public HomeTaskService(IRepository<Course> courseRepository, IRepository<HomeTask> homeTaskRepository)
@@ -20,12 +23,17 @@ namespace Services
             _homeTaskRepository = homeTaskRepository;
         }
 
-        public virtual HomeTask CreateHomeTask(HomeTask homeTask)
+        public virtual ValidationResponse<HomeTask> CreateHomeTask(HomeTask homeTask)
         {
-            //Todo think if it is needed to retrieve course
+            var response = ValidateHomeTask(homeTask);
+            if (response.HasErrors)
+            {
+                return response;
+            }
             var course = _courseRepository.GetById(homeTask.CourseId);
             homeTask.Course = course;
-            return _homeTaskRepository.Create(homeTask);
+            var createdHomeTask = _homeTaskRepository.Create(homeTask);
+            return new ValidationResponse<HomeTask>(createdHomeTask);
         }
 
         public virtual HomeTask GetHomeTaskById(int id)
@@ -33,19 +41,47 @@ namespace Services
             return _homeTaskRepository.GetById(id);
         }
 
-        public virtual void UpdateHomeTask(HomeTask homeTask)
+        public virtual ValidationResponse UpdateHomeTask(HomeTask homeTask)
         {
+            var response = ValidateHomeTask(homeTask);
+            if (response.HasErrors)
+            {
+                return response;
+            }
             _homeTaskRepository.Update(homeTask);
+            return new ValidationResponse();
         }
 
         public virtual void DeleteHomeTask(int homeTaskId)
         {
+            var homeTask = _homeTaskRepository.GetById(homeTaskId);
+            if (homeTask == null)
+            {
+                throw new ArgumentException($"Cannot find homeTask with id '{homeTaskId}'");
+            }
             _homeTaskRepository.Remove(homeTaskId);
         }
 
         public virtual List<HomeTask> GetAllHomeTasks()
         {
             return _homeTaskRepository.GetAll();
+        }
+
+        private ValidationResponse<HomeTask> ValidateHomeTask(HomeTask homeTask)
+        {
+            if (homeTask == null)
+            {
+                return new ValidationResponse<HomeTask>("homeTask", "HomeTask cannot be null");
+            }
+
+            var all = _homeTaskRepository.GetAll();
+
+            if (all.Any(p => p.Title == homeTask.Title))
+            {
+                return new ValidationResponse<HomeTask>("title", $"HomeTask with title '{homeTask.Title}' already exists.");
+            }
+
+            return new ValidationResponse<HomeTask>(homeTask);
         }
     }
 }

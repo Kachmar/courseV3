@@ -15,7 +15,8 @@ namespace Fundamentals
 
         public ScopeOrchestration(
             IScopedService scopedService,
-            ITransientService transientService, ISingletonService singletonService)
+            ITransientService transientService,
+            ISingletonService singletonService)
         {
             this.scopedService = scopedService;
             this.transientService = transientService;

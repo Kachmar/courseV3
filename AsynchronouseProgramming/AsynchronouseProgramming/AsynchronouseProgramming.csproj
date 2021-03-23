@@ -20,9 +20,9 @@
     <Compile Remove="SimpleThread_1.cs" />
     <Compile Remove="StaticsInMultiThreading.cs" />
     <Compile Remove="StaticsInMultiThreading_3.cs" />
-    <Compile Remove="StudentTaskNumber2.cs" />
     <Compile Remove="TaskCancellation.cs" />
     <Compile Remove="TaskCancellation_11.cs" />
+    <Compile Remove="TaskForStudents.cs" />
     <Compile Remove="TaskForStudents_ready.cs" />
     <Compile Remove="TaskRunAndWait.cs" />
     <Compile Remove="TaskRunAndWait_9.cs" />

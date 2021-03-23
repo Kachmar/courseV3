@@ -1,7 +1,9 @@
 ﻿using System;
 using Models.Models;
 using System.Collections.Generic;
+using System.Linq;
 using Models;
+using Services.Validators;
 
 namespace Services
 {
@@ -32,9 +34,31 @@ namespace Services
             return _studentRepository.GetById(studentId);
         }
 
-        public virtual void UpdateStudent(Student student)
+        public virtual ValidationResponse UpdateStudent(Student student)
         {
+            ValidationResponse<Student> response = ValidateStudent(student);
+            if (response.HasErrors)
+            {
+                return response;
+            }
             _studentRepository.Update(student);
+            return new ValidationResponse();
+        }
+
+        private ValidationResponse<Student> ValidateStudent(Student student)
+        {
+            if (student == null)
+            {
+                return new ValidationResponse<Student>("student", "Student cannot be null");
+            }
+
+            var all = _studentRepository.GetAll();
+
+            if (all.Any(p => p.Email == student.Email))
+            {
+                return new ValidationResponse<Student>("email", $"Student with email '{student.Email}' already exists.");
+            }
+            return new ValidationResponse<Student>(student);
         }
 
         public virtual void DeleteStudent(int id)
@@ -42,7 +66,7 @@ namespace Services
             var student = _studentRepository.GetById(id);
             if (student == null)
             {
-                throw new Exception($"Cannot find student with id '{id}'");
+                throw new ArgumentException($"Cannot find student with id '{id}'");
             }
 
             foreach (var studentHomeTaskAssessment in student.HomeTaskAssessments.ToArray())
@@ -53,9 +77,16 @@ namespace Services
             _studentRepository.Remove(id);
         }
 
-        public virtual Student CreateStudent(Student student)
+        public virtual ValidationResponse<Student> CreateStudent(Student student)
         {
-            return _studentRepository.Create(student);
+            ValidationResponse<Student> response = ValidateStudent(student);
+            if (response.HasErrors)
+            {
+                return response;
+            }
+
+            var newStudent = _studentRepository.Create(student);
+            return new ValidationResponse<Student>(newStudent);
         }
     }
 }

@@ -35,6 +35,7 @@ namespace WebApi
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
             services.AddScoped<IRepository<Course>>(p => new CourseRepository(connectionString));
             services.AddScoped<IRepository<HomeTask>>(p => new HomeTaskRepository(connectionString));
+            services.AddScoped<IRepository<HomeTaskAssessment>>(p => new HomeTaskAssessmentRepository(connectionString));
             services.AddScoped<IRepository<Student>>(p => new StudentRepository(connectionString));
         }
 

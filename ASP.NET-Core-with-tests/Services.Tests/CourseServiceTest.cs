@@ -4,6 +4,7 @@ using FluentAssertions;
 using Models;
 using Models.Models;
 using NSubstitute;
+using NSubstitute.ReceivedExtensions;
 using Services.Validators;
 using Xunit;
 
@@ -11,6 +12,9 @@ namespace Services.Tests
 {
     public class CourseServiceTest
     {
+        private const int HomeTaskId = 23;
+        private const int HomeTaskAssessmentId = 55;
+
         [Fact]
         public void CreateCourse_ReturnsInsertedCourse()
         {
@@ -66,6 +70,20 @@ namespace Services.Tests
         }
 
         [Fact]
+        public void CreateCourse_ReturnsValidationError_WhenNullPassed()
+        {
+            //Arrange
+            CourseService courseService = new CourseService(null, null, null, null);
+
+            //Act
+            var createdCourse = courseService.CreateCourse(null);
+
+            //Assert
+            ValidationResponse<Course> expected = new ValidationResponse<Course>("course", "Course cannot be null");
+            expected.Should().BeEquivalentTo(createdCourse);
+        }
+
+        [Fact]
         public void SetStudentsToCourse_PositiveCase()
         {
             //Arrange
@@ -101,19 +119,103 @@ namespace Services.Tests
         {
             //Arrange
             var courseRepository = Substitute.For<IRepository<Course>>();
+            courseRepository.GetAll().Returns(new List<Course>());
 
-            //courseRepository.GetById(Arg.Any<int>()).Returns(nu);
             CourseService courseService = new CourseService(courseRepository, null, null, null);
 
             //Act and Assert
-            Assert.Throws<ArgumentException>(() => { courseService.SetStudentsToCourse(5, new List<int>() { 3 }); });
+            var exception = Assert.Throws<ArgumentException>(() => { courseService.SetStudentsToCourse(5, new List<int>() { 3 }); });
+            Assert.Equal("There is no course with id '5'", exception.Message);
         }
-
 
         [Fact]
         public void SetStudentsToCourse_NoStudentExistsWithGivenId_ThrowsException()
         {
+            //Arrange
+            var courseRepository = Substitute.For<IRepository<Course>>();
+            var course = GetDefaultCourse(10);
+            course.Students.Add(new Student() { Id = 2 });
+            courseRepository.GetById(course.Id).Returns(course);
+            var studentRepository = Substitute.For<IRepository<Student>>();
 
+            CourseService courseService = new CourseService(courseRepository, studentRepository, null, null);
+
+            //Act and Assert
+            var exception = Assert.Throws<ArgumentException>(() =>
+            {
+                courseService.SetStudentsToCourse(10, new List<int>()
+                {
+                    3, 4
+                });
+            });
+            Assert.Equal("Cannot find student with id '3'", exception.Message);
+        }
+
+        [Fact]
+        public void UpdateCourse_ReturnEmptyValidationResponse_WhenCourseIsValid()
+        {
+            //Arrange
+            Course course = GetDefaultCourse();
+            var courseRepository = Substitute.For<IRepository<Course>>();
+            courseRepository.GetAll().Returns(new List<Course>());
+            CourseService courseService = new CourseService(courseRepository, null, null, null);
+
+            //Act
+            var result = courseService.UpdateCourse(course);
+
+            //Assert
+            ValidationResponse expected = new ValidationResponse();
+            expected.Should().BeEquivalentTo(result);
+            courseRepository.Received(Quantity.Exactly(1)).Update(course);
+        }
+
+        [Fact]
+        public void DeleteCourse_RemovesCourse_WhenCourseExist()
+        {
+            //Arrange
+            HomeTaskAssessment homeTaskAssessment = new HomeTaskAssessment()
+            {
+                Id = HomeTaskAssessmentId
+            };
+            HomeTask homeTask = new HomeTask()
+            {
+                HomeTaskAssessments = new List<HomeTaskAssessment>()
+            {
+                homeTaskAssessment
+            },
+                Id = HomeTaskId
+            };
+            Course course = GetDefaultCourse();
+            course.HomeTasks = new List<HomeTask>()
+            {
+                homeTask
+            };
+            var courseRepository = Substitute.For<IRepository<Course>>();
+            courseRepository.GetById(course.Id).Returns(course);
+            IRepository<HomeTask> homeTaskRepository = Substitute.For<IRepository<HomeTask>>();
+            IRepository<HomeTaskAssessment> homeTaskAssessmentRepository = Substitute.For<IRepository<HomeTaskAssessment>>();
+            CourseService courseService = new CourseService(courseRepository, null, homeTaskRepository, homeTaskAssessmentRepository);
+
+            //Act
+            courseService.DeleteCourse(course.Id);
+
+            //Assert
+            courseRepository.Received(Quantity.Exactly(1)).Remove(course.Id);
+            homeTaskRepository.Received(Quantity.Exactly(1)).Remove(HomeTaskId);
+            homeTaskAssessmentRepository.Received(Quantity.Exactly(1)).Remove(HomeTaskAssessmentId);
+        }
+
+
+        [Fact]
+        public void DeleteCourse_ThrowsException_WhenNoCourseExist()
+        {
+            //Arrange
+            var courseRepository = Substitute.For<IRepository<Course>>();
+            CourseService courseService = new CourseService(courseRepository, null, null, null);
+
+            //Act and Assert
+            var exception = Assert.Throws<ArgumentException>(() => { courseService.DeleteCourse(5); });
+            Assert.Equal("Cannot find course with id '5'", exception.Message);
         }
 
         private Course GetDefaultCourse(int id = 0)

@@ -1,10 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Models;
-using Models.Models;
 using Services;
 using WebApi.Dto;
 
@@ -46,15 +42,23 @@ namespace WebApi.Controllers
         [HttpPost]
         public ActionResult<StudentDto> Post([FromBody] StudentDto student)
         {
-            var createdStudent = _studentService.CreateStudent(student.ToModel());
-            return Accepted(StudentDto.FromModel(createdStudent));
+            var result = _studentService.CreateStudent(student.ToModel());
+            if (result.HasErrors)
+            {
+                return BadRequest(result.Errors);
+            }
+            return Accepted(StudentDto.FromModel(result.Result));
         }
 
         // PUT api/Student/5
         [HttpPut("{id}")]
         public ActionResult Put(int id, [FromBody] StudentDto value)
         {
-            _studentService.UpdateStudent(value.ToModel());
+            var result = _studentService.UpdateStudent(value.ToModel());
+            if (result.HasErrors)
+            {
+                return BadRequest(result.Errors);
+            }
             return Accepted();
         }
 

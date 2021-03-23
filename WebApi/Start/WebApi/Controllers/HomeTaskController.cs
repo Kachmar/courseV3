@@ -1,11 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Models;
-using Models.Models;
 using Services;
 using WebApi.Dto;
 
@@ -21,6 +16,7 @@ namespace WebApi.Controllers
         {
             _homeTaskService = homeTaskService;
         }
+
         // GET: api/HomeTask
         [HttpGet]
         public ActionResult<IEnumerable<HomeTaskDto>> Get()
@@ -46,15 +42,23 @@ namespace WebApi.Controllers
         [HttpPost]
         public ActionResult<HomeTaskDto> Post([FromBody] HomeTaskDto homeTask)
         {
-            var createdHomeTask = _homeTaskService.CreateHomeTask(homeTask.ToModel());
-            return Accepted(HomeTaskDto.FromModel(createdHomeTask));
+            var result = _homeTaskService.CreateHomeTask(homeTask.ToModel());
+            if (result.HasErrors)
+            {
+                return BadRequest(result.Errors);
+            }
+            return Accepted(HomeTaskDto.FromModel(result.Result));
         }
 
         // PUT api/HomeTask/5
         [HttpPut("{id}")]
         public ActionResult Put(int id, [FromBody] HomeTaskDto value)
         {
-            _homeTaskService.UpdateHomeTask(value.ToModel());
+            var result = _homeTaskService.UpdateHomeTask(value.ToModel());
+            if (result.HasErrors)
+            {
+                return BadRequest(result.Errors);
+            }
             return Accepted();
         }
 
