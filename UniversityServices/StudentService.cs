@@ -41,6 +41,7 @@ namespace Services
             {
                 return response;
             }
+
             _studentRepository.Update(student);
             return new ValidationResponse();
         }
@@ -52,12 +53,6 @@ namespace Services
                 return new ValidationResponse<Student>("student", "Student cannot be null");
             }
 
-            var all = _studentRepository.GetAll();
-
-            if (all.Any(p => p.Email == student.Email))
-            {
-                return new ValidationResponse<Student>("email", $"Student with email '{student.Email}' already exists.");
-            }
             return new ValidationResponse<Student>(student);
         }
 
@@ -84,7 +79,12 @@ namespace Services
             {
                 return response;
             }
+            var all = _studentRepository.GetAll();
 
+            if (all.Any(p => p.Email == student.Email))
+            {
+                return new ValidationResponse<Student>("email", $"Student with email '{student.Email}' already exists.");
+            }
             var newStudent = _studentRepository.Create(student);
             return new ValidationResponse<Student>(newStudent);
         }

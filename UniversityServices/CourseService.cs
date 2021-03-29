@@ -67,6 +67,7 @@ namespace Services
             {
                 return response;
             }
+
             _courseRepository.Update(course);
             return new ValidationResponse();
         }
@@ -78,7 +79,12 @@ namespace Services
             {
                 return response;
             }
+            var all = _courseRepository.GetAll();
 
+            if (all.Any(p => p.Name == course.Name))
+            {
+                return new ValidationResponse<Course>("name", $"course with name '{course.Name}' already exists.");
+            }
             var newCourse = _courseRepository.Create(course);
             return new ValidationResponse<Course>(newCourse);
         }
@@ -114,12 +120,7 @@ namespace Services
             {
                 return new ValidationResponse<Course>(nameof(course.StartDate), "Start date cannot be greater than end date!");
             }
-            var all = _courseRepository.GetAll();
-           
-            if (all.Any(p => p.Name == course.Name))
-            {
-                return new ValidationResponse<Course>("name", $"course with name '{course.Name}' already exists.");
-            }
+            
             return new ValidationResponse<Course>(course);
         }
     }

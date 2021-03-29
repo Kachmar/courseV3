@@ -30,6 +30,12 @@ namespace Services
             {
                 return response;
             }
+            var all = _homeTaskRepository.GetAll();
+
+            if (all.Any(p => p.Title == homeTask.Title))
+            {
+                return new ValidationResponse<HomeTask>("title", $"HomeTask with title '{homeTask.Title}' already exists.");
+            }
             var course = _courseRepository.GetById(homeTask.CourseId);
             homeTask.Course = course;
             var createdHomeTask = _homeTaskRepository.Create(homeTask);
@@ -48,6 +54,7 @@ namespace Services
             {
                 return response;
             }
+           
             _homeTaskRepository.Update(homeTask);
             return new ValidationResponse();
         }
@@ -72,13 +79,6 @@ namespace Services
             if (homeTask == null)
             {
                 return new ValidationResponse<HomeTask>("homeTask", "HomeTask cannot be null");
-            }
-
-            var all = _homeTaskRepository.GetAll();
-
-            if (all.Any(p => p.Title == homeTask.Title))
-            {
-                return new ValidationResponse<HomeTask>("title", $"HomeTask with title '{homeTask.Title}' already exists.");
             }
 
             return new ValidationResponse<HomeTask>(homeTask);
