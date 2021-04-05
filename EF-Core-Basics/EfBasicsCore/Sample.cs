@@ -68,7 +68,7 @@ namespace EFSaving.RelatedData
             #endregion
         }
 
-        public class BloggingContext : DbContext
+        public class BloggingContext : DbConte xt
         {
             public DbSet<Blog> Blogs { get; set; }
             public DbSet<Post> Posts { get; set; }

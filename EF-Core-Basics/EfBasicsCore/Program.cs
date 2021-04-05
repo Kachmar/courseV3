@@ -6,9 +6,6 @@ namespace EfBasicsCore
     using System.Linq;
 
     using EfBasicsCore.EF;
-
-    using EFSaving.RelatedData;
-
     using Microsoft.EntityFrameworkCore;
 
     class Program
@@ -205,7 +202,7 @@ namespace EfBasicsCore
         {
             using (var context = new UniversityContext())
             {
-                foreach (var contextStudent in context.Students)
+                foreach (var contextStudent in context.Students.Include(s => s.Exams))
                 {
                     Console.WriteLine(contextStudent.Name);
                     //but what would happen if we want to display exam info?

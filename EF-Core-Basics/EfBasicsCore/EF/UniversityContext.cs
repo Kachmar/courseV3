@@ -1,19 +1,16 @@
-﻿namespace EfBasicsCore.EF
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace EfBasicsCore.EF
 {
     using System;
 
     public class UniversityContext : DbContext
     {
-    
-        public static readonly ILoggerFactory loggerFactory = LoggerFactory.Create(builder => {
-                builder.AddConsole();
-            }
-        );
-
+        
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseLoggerFactory(loggerFactory)
-                
+            optionsBuilder
+                .LogTo(Console.WriteLine)
                 .UseSqlServer(@"Data Source=NB00MCF001\SQLEXPRESS;Initial Catalog=EntityFrameworkBasics;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
         }
 
