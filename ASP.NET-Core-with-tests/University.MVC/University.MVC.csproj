@@ -12,9 +12,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\DataAccess.EF\DataAccess.EF.csproj" />
     <ProjectReference Include="..\..\Models\Models.csproj" />
     <ProjectReference Include="..\..\UniversityServices\Services.csproj" />
-    <ProjectReference Include="..\DataAccess.EF\DataAccess.EF.csproj" />
   </ItemGroup>
 
 </Project>

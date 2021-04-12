@@ -24,9 +24,10 @@ namespace University.MVC.Controllers
         }
 
         // GET
-        public async Task<IActionResult> Courses()
+        public IActionResult Courses()
         {
-            return View(_courseService.GetAllCourses().Select(ToViewModel));
+            var courses = _courseService.GetAllCourses().Select(ToViewModel);
+            return View(courses);
         }
 
         [Authorize(Roles = "Admin")]
