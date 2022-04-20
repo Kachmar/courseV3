@@ -39,12 +39,12 @@ namespace EfBasicsCore
             TryOneToMany();
 
             //one-to-one
-            TryOneToOne();
+            //TryOneToOne();
 
             //many-to-many
             TryManyToMany();
 
-            TryInheritance();
+            //TryInheritance();
 
             Console.ReadKey();
         }
@@ -92,24 +92,24 @@ namespace EfBasicsCore
                 //    Student = student2
                 //});
 
-                //var lecturer1 = context.Lecturers.Add(new Lecturer() { Name = "Peter" }).Entity;
-                //var lecturer2 = context.Lecturers.Add(new Lecturer() { Name = "Ivan" }).Entity;
+                var lecturer1 = context.Lecturers.Add(new Lecturer() { Name = "Peter" }).Entity;
+                var lecturer2 = context.Lecturers.Add(new Lecturer() { Name = "Ivan" }).Entity;
 
-                //lecturer1.LecturerStudents =
-                //    new List<LecturerStudent>() { new LecturerStudent() { Lecturer = lecturer1, Student = student1 } };
-                //lecturer2.LecturerStudents =
-                //    new List<LecturerStudent>() { new LecturerStudent() { Lecturer = lecturer2, Student = student2 } };
+                lecturer1.Students =
+                    new List<Student>() { student1 };
+                lecturer2.Students =
+                    new List<Student>() { student2 };
 
-                //context.Students.Add(
-                //    new DistantStudent()
-                //    {
-                //        Speciality = "Physics",
-                //        BirthDate = DateTime.Now,
-                //        Name = "George Smith",
-                //        DistantLocation = "Turka"
-                //    });
+                context.Students.Add(
+                    new DistantStudent()
+                    {
+                        Speciality = "Physics",
+                        BirthDate = DateTime.Now,
+                        Name = "George Smith",
+                        DistantLocation = "Turka"
+                    });
 
-                context.SaveChanges();
+                  context.SaveChanges();
             }
         }
 
@@ -167,19 +167,19 @@ namespace EfBasicsCore
             //Lets also check the DB schema
             using (var context = new UniversityContext())
             {
-                var lecturer = context.Lecturers.Find(1);
+                var lecturer = context.Lecturers.Include(p => p.Students).FirstOrDefault(p => p.Id == 1);
                 Console.WriteLine($"LecturerStudents of the lecturer {lecturer.Name}");
 
-                foreach (var lecturerStudent in lecturer.LecturerStudents)
+                foreach (var lecturerStudent in lecturer.Students)
                 {
-                    Console.WriteLine(lecturerStudent.Student.Name);
+                    Console.WriteLine(lecturerStudent.Name);
                 }
 
-                var student = context.Students.Find(1);
+                var student = context.Students.Include(p=>p.Lecturers).FirstOrDefault(p=>p.StudentId==1);
                 Console.WriteLine($"LecturerStudents of the student {student.Name}");
-                foreach (var studentLecturer in student.LecturerStudents)
+                foreach (var studentLecturer in student.Lecturers)
                 {
-                    Console.WriteLine(studentLecturer.Lecturer.Name);
+                    Console.WriteLine(studentLecturer.Name);
                 }
             }
         }

@@ -30,7 +30,7 @@
         public virtual StudentAddress StudentAddress { get; set; }
 
         //Many-to-Many relation
-        public List<LecturerStudent> LecturerStudents { get; set; }
+        public List<Lecturer> Lecturers { get; set; }
     }
 
     public class DistantStudent : Student

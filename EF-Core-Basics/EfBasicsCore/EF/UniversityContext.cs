@@ -10,15 +10,15 @@ namespace EfBasicsCore.EF
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder
-                .LogTo(Console.WriteLine)
-                .UseSqlServer(@"Data Source=NB00MCF001\SQLEXPRESS;Initial Catalog=EntityFrameworkBasics;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
+                //.LogTo(Console.WriteLine)
+                .UseSqlServer(@"Data Source=NB00MCF030;Initial Catalog=EntityFrameworkBasics;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //Many to Many
 
-            modelBuilder.Entity<LecturerStudent>().HasKey(k => new { k.LecturerId, k.StudentId });
+           // modelBuilder.Entity<LecturerStudent>().HasKey(k => new { k.LecturerId, k.StudentId });
 
             //Data Seeding
             //modelBuilder.Entity<Student>().HasData(new Student()
