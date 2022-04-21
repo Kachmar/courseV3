@@ -28,14 +28,7 @@ namespace EfCoreFluent
                 var lecturer = new Lecturer()
                 {
                     Name = "Bill",
-                    LecturerStudents =
-                                           new List<LecturerStudent>()
-                                               {
-                                                   new LecturerStudent()
-                                                       {
-                                                           Student = student
-                                                       }
-                                               }
+                    Students = new List<Student>() { student }
                 };
 
                 context.Lecturers.Add(lecturer);

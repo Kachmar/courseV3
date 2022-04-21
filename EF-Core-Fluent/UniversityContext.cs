@@ -20,7 +20,6 @@
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            this.SetManyToManyRelation(modelBuilder);
             modelBuilder.HasDefaultSchema("FluentDemo");
 
             SetOneTableFor2Entities(modelBuilder);
@@ -45,10 +44,6 @@
             modelBuilder.Entity<StudentAddress>().ToTable("Student");
         }
 
-        private void SetManyToManyRelation(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<LecturerStudent>().HasKey(k => new { k.LecturerId, k.StudentId });
-        }
 
         private void SetInheritance(ModelBuilder modelBuilder)
         {
