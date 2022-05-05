@@ -35,16 +35,25 @@ namespace University.MVC.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult Create(HomeTaskViewModel homeTask, int courseId)
         {
+            ViewData["Action"] = "Create";
+            ViewData["CourseId"] = courseId;
             if (!ModelState.IsValid)
             {
-                ViewData["Action"] = "Create";
-                ViewData["CourseId"] = courseId;
                 return View("Edit", homeTask);
             }
+
+            var validationResult = _homeTaskService.CreateHomeTask(ToModel(homeTask));
+            if (validationResult.HasErrors)
+            {
+                foreach (var validationResultError in validationResult.Errors)
+                {
+                    ModelState.AddModelError(validationResultError.Key, validationResultError.Value);
+                }
+                return View("Edit", homeTask);
+            }
+
             var routeValueDictionary = new RouteValueDictionary();
             routeValueDictionary.Add("id", courseId);
-
-            _homeTaskService.CreateHomeTask(ToModel(homeTask));
             return RedirectToAction("Edit", "Course", routeValueDictionary);
         }
 
@@ -64,17 +73,26 @@ namespace University.MVC.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult Edit(HomeTaskViewModel homeTaskParameter)
         {
+            ViewData["Action"] = "Edit";
+
             if (!ModelState.IsValid)
             {
-                ViewData["Action"] = "Edit";
+                return View(homeTaskParameter);
+            }
 
+            var validationResult = _homeTaskService.UpdateHomeTask(ToModel(homeTaskParameter));
+
+            if (validationResult.HasErrors)
+            {
+                foreach (var validationResultError in validationResult.Errors)
+                {
+                    ModelState.AddModelError(validationResultError.Key, validationResultError.Value);
+                }
                 return View(homeTaskParameter);
             }
 
             var homeTask = _homeTaskService.GetHomeTaskById(homeTaskParameter.Id);
-
             var routeValueDictionary = new RouteValueDictionary();
-            _homeTaskService.UpdateHomeTask(ToModel(homeTaskParameter));
             routeValueDictionary.Add("id", homeTask.Course.Id);
             return RedirectToAction("Edit", "Course", routeValueDictionary);
         }

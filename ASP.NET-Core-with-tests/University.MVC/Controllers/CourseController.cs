@@ -23,7 +23,6 @@ namespace University.MVC.Controllers
             _studentService = studentService;
         }
 
-        // GET
         public IActionResult Courses()
         {
             var courses = _courseService.GetAllCourses().Select(ToViewModel);
@@ -68,7 +67,16 @@ namespace University.MVC.Controllers
             {
                 return BadRequest();
             }
-            _courseService.UpdateCourse(ToModel(courseParameter));
+            var validationResult = _courseService.UpdateCourse(ToModel(courseParameter));
+            if (validationResult.HasErrors)
+            {
+                foreach (var validationResultError in validationResult.Errors)
+                {
+                    ModelState.AddModelError(validationResultError.Key, validationResultError.Value);
+                }
+                ViewData["action"] = nameof(this.Edit);
+                return View(courseParameter);
+            }
             return RedirectToAction(nameof(Courses));
         }
 
@@ -80,21 +88,21 @@ namespace University.MVC.Controllers
             {
                 return BadRequest();
             }
-            ViewData["action"] = nameof(this.Create);
+
             if (!ModelState.IsValid)
             {
                 return View("Edit", courseParameter);
             }
 
-            try
+            var validationResult = _courseService.CreateCourse(ToModel(courseParameter));
+            if (validationResult.HasErrors)
             {
-                _courseService.CreateCourse(ToModel(courseParameter));
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("Name", ex.Message);
-                return View("Edit", courseParameter);
+                foreach (var validationResultError in validationResult.Errors)
+                {
+                    ModelState.AddModelError(validationResultError.Key, validationResultError.Value);
+                }
 
+                return View("Edit", courseParameter);
             }
 
             return RedirectToAction(nameof(Courses));

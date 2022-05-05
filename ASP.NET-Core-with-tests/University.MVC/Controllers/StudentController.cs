@@ -45,17 +45,25 @@ namespace University.MVC.Controllers
         [Authorize]
         public async Task<IActionResult> Edit(StudentViewModel student)
         {
+            ViewData["Action"] = "Edit";
+
             if (!ModelState.IsValid)
             {
-                ViewData["Action"] = "Edit";
                 return View("Edit", student);
             }
 
             var result = await _authorizationService.AuthorizeAsync(User, student, "SameUserPolicy");
             if (result.Succeeded)
             {
-                _studentService.UpdateStudent(ToModel(student));
-
+                var validationResult = _studentService.UpdateStudent(ToModel(student));
+                if (validationResult.HasErrors)
+                {
+                    foreach (var validationResultError in validationResult.Errors)
+                    {
+                        ModelState.AddModelError(validationResultError.Key, validationResultError.Value);
+                    }
+                    return View("Edit", student);
+                }
                 return RedirectToAction("Students");
             }
             return Forbid();
@@ -82,13 +90,21 @@ namespace University.MVC.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult Create(StudentViewModel student)
         {
+            ViewData["Action"] = "Create";
             if (!ModelState.IsValid)
             {
-                ViewData["Action"] = "Create";
                 return View("Edit", student);
             }
 
-            _studentService.CreateStudent(ToModel(student));
+            var validationResult = _studentService.CreateStudent(ToModel(student));
+            if (validationResult.HasErrors)
+            {
+                foreach (var validationResultError in validationResult.Errors)
+                {
+                    ModelState.AddModelError(validationResultError.Key, validationResultError.Value);
+                }
+                return View("Edit", student);
+            }
             return RedirectToAction("Students");
         }
 
